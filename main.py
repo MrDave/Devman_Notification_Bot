@@ -1,9 +1,10 @@
-import requests
-from pprint import pprint
-from environs import Env
-import logging
 import functools
+import logging
+from pprint import pprint
 from time import sleep
+
+import requests
+from environs import Env
 
 
 def retry_on_failure(exceptions=(Exception,)):
