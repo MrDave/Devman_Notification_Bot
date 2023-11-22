@@ -44,9 +44,13 @@ def main():
     logger.setLevel(level=logging.DEBUG)
 
     devman_token = env.str("DEVMAN_AUTH")
-
+    timestamp = None
     while True:
-        response = get_dvmn_response(devman_token)
+        response = get_dvmn_response(devman_token, timestamp)
+        if response["status"] == "timeout":
+            timestamp = response["timestamp_to_request"]
+        if response["status"] == "found":
+            timestamp = response["last_attempt_timestamp"]
         pprint(response)
 
 
