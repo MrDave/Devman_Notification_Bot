@@ -2,14 +2,36 @@ import requests
 from pprint import pprint
 from environs import Env
 import logging
+import functools
+from time import sleep
 
 
-def get_dvmn_response(token):
+def retry_on_failure(exceptions=(Exception,)):
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            retry_attempt = 0
+            while True:
+                try:
+                    return func(*args, **kwargs)
+                except exceptions as e:
+                    logging.warning(f"Failed to execute {func.__name__}. Retrying in {4 ** retry_attempt}s. Error: {e}")
+                    sleep(4 ** retry_attempt)
+                    retry_attempt = retry_attempt + 1 if retry_attempt < 5 else retry_attempt
+        return wrapper
+    return decorator
+
+
+@retry_on_failure(exceptions=(requests.ConnectionError, requests.ConnectTimeout))
+def get_dvmn_response(token, timestamp=None):
     url = "https://dvmn.org/api/long_polling/"
     headers = {
         "Authorization": f"Token {token}"
     }
-    response = requests.get(url, headers=headers, timeout=5)
+    params = {
+        "timestamp": timestamp
+    }
+    response = requests.get(url, headers=headers)
     response.raise_for_status()
     return response.json()
 
@@ -24,11 +46,8 @@ def main():
     devman_token = env.str("DEVMAN_AUTH")
 
     while True:
-        try:
-            response = get_dvmn_response(devman_token)
-            pprint(response)
-        except requests.exceptions.Timeout as error:
-            logging.debug(f"Timeout: {error}")
+        response = get_dvmn_response(devman_token)
+        pprint(response)
 
 
 if __name__ == '__main__':
