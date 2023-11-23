@@ -1,6 +1,5 @@
 import functools
 import logging
-from pprint import pprint
 from time import sleep
 
 import requests
@@ -70,10 +69,21 @@ def main():
             timestamp = response["timestamp_to_request"]
         if response["status"] == "found":
             timestamp = response["last_attempt_timestamp"]
-            dp.bot.send_message(
-                chat_id=tg_user_id,
-                text="There's an update for your work!"
-            )
+            for attempt in response["new_attempts"]:
+                title = attempt["lesson_title"]
+                link = attempt["lesson_url"]
+                is_negative = attempt["is_negative"]
+                if is_negative:
+                    success_or_not_text = "Нужно что\-то доработать\."
+                else:
+                    success_or_not_text = "Работа принята\!"
+                text = f"Урок [{title}]({link}) вернулся с проверки\.\n\n{success_or_not_text}"
+                dp.bot.send_message(
+                    chat_id=tg_user_id,
+                    text=text,
+                    disable_web_page_preview=True,
+                    parse_mode="MarkdownV2",
+                )
 
 
 if __name__ == '__main__':
