@@ -5,6 +5,8 @@ from time import sleep
 
 import requests
 from environs import Env
+from telegram import Update
+from telegram.ext import Updater, CallbackContext, CommandHandler
 
 
 def retry_on_failure(exceptions=(Exception,)):
@@ -32,9 +34,16 @@ def get_dvmn_response(token, timestamp=None):
     params = {
         "timestamp": timestamp
     }
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers, params=params)
     response.raise_for_status()
     return response.json()
+
+
+def start(update: Update, context: CallbackContext):
+    context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text=f"Heyo, {update.effective_user.first_name} I'm a notification bot! 'Sup?"
+    )
 
 
 def main():
@@ -45,6 +54,15 @@ def main():
     logger.setLevel(level=logging.DEBUG)
 
     devman_token = env.str("DEVMAN_AUTH")
+    bot_token = env.str("TELEGRAM_BOT_TOKEN")
+    tg_user_id = env.str("TELEGRAM_USER_ID")
+
+    updater = Updater(token=bot_token)
+    dp = updater.dispatcher
+
+    dp.add_handler(CommandHandler("start", start))
+    updater.start_polling()
+
     timestamp = None
     while True:
         response = get_dvmn_response(devman_token, timestamp)
@@ -52,7 +70,10 @@ def main():
             timestamp = response["timestamp_to_request"]
         if response["status"] == "found":
             timestamp = response["last_attempt_timestamp"]
-        pprint(response)
+            dp.bot.send_message(
+                chat_id=tg_user_id,
+                text="There's an update for your work!"
+            )
 
 
 if __name__ == '__main__':
