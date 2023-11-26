@@ -26,7 +26,7 @@ def retry_on_failure(exceptions=(Exception,)):
     return decorator
 
 
-@retry_on_failure(exceptions=(requests.ConnectionError, requests.ConnectTimeout))
+@retry_on_failure(exceptions=(requests.ConnectionError, requests.Timeout))
 def get_dvmn_response(token, timestamp=None):
     url = "https://dvmn.org/api/long_polling/"
     headers = {
