@@ -4,8 +4,7 @@ from time import sleep
 
 import requests
 from environs import Env
-from telegram import Update
-from telegram.ext import Updater, CallbackContext, CommandHandler
+from telegram.ext import Updater
 
 
 def retry_on_failure(exceptions=(Exception,)):
@@ -38,13 +37,6 @@ def get_dvmn_response(token, timestamp=None):
     return response.json()
 
 
-def start(update: Update, context: CallbackContext):
-    context.bot.send_message(
-        chat_id=update.effective_chat.id,
-        text=f"Heyo, {update.effective_user.first_name} I'm a notification bot! 'Sup?"
-    )
-
-
 def main():
     env = Env()
     env.read_env()
@@ -58,9 +50,6 @@ def main():
 
     updater = Updater(token=bot_token)
     dp = updater.dispatcher
-
-    dp.add_handler(CommandHandler("start", start))
-    updater.start_polling()
 
     timestamp = None
     while True:
