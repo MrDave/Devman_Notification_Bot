@@ -7,6 +7,9 @@ from environs import Env
 from telegram.ext import Updater
 
 
+logger = logging.getLogger()
+
+
 def retry_on_failure(exceptions=(Exception,)):
     def decorator(func):
         @functools.wraps(func)
@@ -41,7 +44,6 @@ def main():
     env = Env()
     env.read_env()
 
-    logger = logging.getLogger()
     logger.setLevel(level=logging.DEBUG)
 
     devman_token = env.str("DEVMAN_AUTH")
