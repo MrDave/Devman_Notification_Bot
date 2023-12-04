@@ -35,7 +35,7 @@ def get_dvmn_response(token, timestamp=None):
     params = {
         "timestamp": timestamp
     }
-    response = requests.get(url, headers=headers, params=params, timeout=5)
+    response = requests.get(url, headers=headers, params=params)
     response.raise_for_status()
     return response.json()
 
@@ -46,7 +46,7 @@ def main():
 
     log_level = env.log_level("LOG_LEVEL", logging.WARNING)
     logger.setLevel(level=log_level)
-    
+
     devman_token = env.str("DEVMAN_AUTH")
     bot_token = env.str("TELEGRAM_BOT_TOKEN")
     tg_user_id = env.str("TELEGRAM_USER_ID")
