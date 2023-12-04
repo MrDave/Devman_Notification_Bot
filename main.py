@@ -44,8 +44,8 @@ def main():
     env = Env()
     env.read_env()
 
-    logger.setLevel(level=logging.DEBUG)
-
+    log_level = env.log_level("LOG_LEVEL", logging.WARNING)
+    logger.setLevel(level=log_level)
     devman_token = env.str("DEVMAN_AUTH")
     bot_token = env.str("TELEGRAM_BOT_TOKEN")
     tg_user_id = env.str("TELEGRAM_USER_ID")
