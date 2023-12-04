@@ -26,7 +26,7 @@ def retry_on_failure(exceptions=(Exception,)):
     return decorator
 
 
-@retry_on_failure(exceptions=(requests.ConnectionError, requests.Timeout))
+@retry_on_failure(exceptions=(requests.ConnectionError, requests.ConnectTimeout))
 def get_dvmn_response(token, timestamp=None):
     url = "https://dvmn.org/api/long_polling/"
     headers = {
@@ -35,7 +35,7 @@ def get_dvmn_response(token, timestamp=None):
     params = {
         "timestamp": timestamp
     }
-    response = requests.get(url, headers=headers, params=params)
+    response = requests.get(url, headers=headers, params=params, timeout=5)
     response.raise_for_status()
     return response.json()
 
@@ -46,6 +46,7 @@ def main():
 
     log_level = env.log_level("LOG_LEVEL", logging.WARNING)
     logger.setLevel(level=log_level)
+    
     devman_token = env.str("DEVMAN_AUTH")
     bot_token = env.str("TELEGRAM_BOT_TOKEN")
     tg_user_id = env.str("TELEGRAM_USER_ID")
@@ -55,7 +56,12 @@ def main():
 
     timestamp = None
     while True:
-        response = get_dvmn_response(devman_token, timestamp)
+        try:
+            response = get_dvmn_response(devman_token, timestamp)
+        except requests.ReadTimeout:
+            logger.debug("ReadTimeout, trying again")
+            continue
+
         if response["status"] == "timeout":
             timestamp = response["timestamp_to_request"]
         if response["status"] == "found":
