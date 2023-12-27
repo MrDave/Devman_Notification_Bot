@@ -18,7 +18,7 @@ Create `.env` file in root folder and write down the following variables:
 - `DEVMAN_AUTH` - Devman API user access token. Get it from the [API docs](https://dvmn.org/api/docs/).
 - `TELEGRAM_BOT_TOKEN` - Access token of your bot. You get one from [BotFather Telegram bot](https://t.me/BotFather) when you create a bot.
 - `TELEGRAM_USER_ID` - Your numeric Telegram ID. Can be checked by writing to special [user info bot](https://t.me/userinfobot).
-- `LOGGING_LEVEL` - Sets the threshold for this logger. Accepts numbers or strings (such as `10` or `"DEBUG"` for DEBUG level)
+- `LOG_LEVEL` - Sets the threshold for this logger. Accepts numbers or strings (such as `10` or `"DEBUG"` for DEBUG level)
 
 ### Running on Windows note  
 If run on Windows, long-polling requests won't allow to stop the program (by using `Ctrl+C`) until they finish. Thus, using [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) might be useful.
