@@ -10,6 +10,18 @@ from telegram.ext import Updater
 logger = logging.getLogger()
 
 
+class TelegramLogsHandler(logging.Handler):
+
+    def __init__(self, tg_bot, chat_id):
+        super().__init__()
+        self.tg_bot = tg_bot
+        self.chat_id = chat_id
+
+    def emit(self, record):
+        log_entry = self.format(record)
+        self.tg_bot.send_message(chat_id=self.chat_id, text=log_entry)
+
+
 def retry_on_failure(exceptions=(Exception,)):
     def decorator(func):
         @functools.wraps(func)
@@ -44,15 +56,18 @@ def main():
     env = Env()
     env.read_env()
 
-    log_level = env.log_level("LOG_LEVEL", logging.WARNING)
-    logger.setLevel(level=log_level)
-
     devman_token = env.str("DEVMAN_AUTH")
     bot_token = env.str("TELEGRAM_BOT_TOKEN")
     tg_user_id = env.str("TELEGRAM_USER_ID")
 
     updater = Updater(token=bot_token)
     dp = updater.dispatcher
+
+    log_level = env.log_level("LOG_LEVEL", logging.WARNING)
+    logger.setLevel(level=log_level)
+    logger.addHandler(TelegramLogsHandler(dp.bot, tg_user_id))
+
+    logger.info("Бот запущен!")
 
     timestamp = None
     while True:
