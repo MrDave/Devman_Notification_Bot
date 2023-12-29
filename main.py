@@ -76,6 +76,9 @@ def main():
         except requests.ReadTimeout:
             logger.debug("ReadTimeout, trying again")
             continue
+        except Exception as e:
+            logger.exception(f"Бот упал с ошибкой:\n")
+            raise
 
         if response["status"] == "timeout":
             timestamp = response["timestamp_to_request"]
