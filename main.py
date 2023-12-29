@@ -78,7 +78,7 @@ def main():
             continue
         except Exception as e:
             logger.exception(f"Бот упал с ошибкой:\n")
-            raise
+            continue
 
         if response["status"] == "timeout":
             timestamp = response["timestamp_to_request"]
