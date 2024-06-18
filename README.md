@@ -17,8 +17,8 @@ Set up environmental variables.
 Create `.env` file in root folder and write down the following variables:
 - `DEVMAN_AUTH` - Devman API user access token. Get it from the [API docs](https://dvmn.org/api/docs/).
 - `TELEGRAM_BOT_TOKEN` - Access token of your bot. You get one from [BotFather Telegram bot](https://t.me/BotFather) when you create a bot.
-- `TELEGRAM_USER_ID` - Your numeric Telegram ID to send logging messages. Can be checked by writing to special [user info bot](https://t.me/userinfobot).
 - `TELEGRAM_LOGGING_BOT_TOKEN` - same as above, but used for sending logs. Can be the same bot or separate as the main one.
+- `TELEGRAM_USER_ID` - Your numeric Telegram ID to send logging messages. Can be checked by writing to special [user info bot](https://t.me/userinfobot).
 - `LOG_LEVEL` - (Optional) Sets the threshold for this logger. Accepts numbers or strings (such as `10` or `"DEBUG"` for DEBUG level)
 
 ### Running on Windows note  
