@@ -6,20 +6,10 @@ import requests
 from environs import Env
 from telegram.ext import Updater
 
+from telegram_helpers import TelegramLogsHandler
+
 
 logger = logging.getLogger()
-
-
-class TelegramLogsHandler(logging.Handler):
-
-    def __init__(self, tg_bot, chat_id):
-        super().__init__()
-        self.tg_bot = tg_bot
-        self.chat_id = chat_id
-
-    def emit(self, record):
-        log_entry = self.format(record)
-        self.tg_bot.send_message(chat_id=self.chat_id, text=log_entry)
 
 
 def retry_on_failure(exceptions=(Exception,)):
@@ -58,6 +48,7 @@ def main():
 
     devman_token = env.str("DEVMAN_AUTH")
     bot_token = env.str("TELEGRAM_BOT_TOKEN")
+    telegram_logging_token = env.str("TELEGRAM_LOGGING_BOT_TOKEN")
     tg_user_id = env.str("TELEGRAM_USER_ID")
 
     updater = Updater(token=bot_token)
@@ -65,7 +56,8 @@ def main():
 
     log_level = env.log_level("LOG_LEVEL", logging.WARNING)
     logger.setLevel(level=log_level)
-    logger.addHandler(TelegramLogsHandler(dp.bot, tg_user_id))
+    logger_bot = Updater(telegram_logging_token).dispatcher.bot
+    logger.addHandler(TelegramLogsHandler(logger_bot, tg_user_id))
 
     logger.info("Бот запущен!")
 
